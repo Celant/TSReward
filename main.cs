@@ -92,7 +92,9 @@ namespace TSREWARD
                             return;
                         case Response.VotedNotClaimed:
                             for (int i = 0; i < config.OnRewardClaimMessage.Text.Length; i++)
+                            {
                                 args.Player.SendMessage(config.OnRewardClaimMessage.Text[i], config.OnRewardClaimMessage.GetColor());
+                            }
 
                             if (SetAsClaimed(args.Player.Name))
                             {
@@ -103,7 +105,9 @@ namespace TSREWARD
                                     Server.TransferToAsync(Player, config.SEconomyReward, config.AnnounceOnReceive ? BankAccountTransferOptions.AnnounceToReceiver : BankAccountTransferOptions.SuppressDefaultAnnounceMessages, "voting on terraria-servers.com", "Voted on terraria-servers.com");
 
                                     for (int i = 0; i < config.Commands.Length; i++)
+                                    {
                                         Commands.HandleCommand(TSPlayer.Server, config.Commands[i].Replace("%playername%", args.Player.Name));
+                                    }
                                 }
                             }
                             return;
@@ -120,11 +124,17 @@ namespace TSREWARD
             {
                 string Res = wc.DownloadString(string.Format("http://terraria-servers.com/api/?object=votes&element=claim&key={0}&username={1}", config.ServerKey, Username));
                 if (Res.Contains("incorrect server key"))
+                {
                     return Response.InvalidServerKey;
-                else
+                } else
+                {
                     return (Response)int.Parse(Res);
+                }
             }
-            catch { return Response.Error; }
+            catch
+            {
+                return Response.Error;
+            }
         }
 
         public bool SetAsClaimed(string Username)
@@ -174,8 +184,8 @@ namespace TSREWARD
             public string ServerKey = "ServerKeyGoesHere";
             public int SEconomyReward = 1000;
             public bool AnnounceOnReceive = true;
-            public string[] Commands = new string[]{ 
-                "/heal %playername%", 
+            public string[] Commands = new string[]{
+                "/heal %playername%",
                 "/firework %playername%"};
             public Message VoteNotFoundMessage = new Message(new string[]{
                 "Vote not found!",
@@ -184,7 +194,7 @@ namespace TSREWARD
             });
             public Message OnRewardClaimMessage = new Message(new string[] {
                 "Thank you for voting on terraria-servers.com",
-                "We really appreciate it!"          
+                "We really appreciate it!"
             });
             public bool ShowIntervalMessage = true;
             public int IntervalInSeconds = 300;
@@ -207,7 +217,6 @@ namespace TSREWARD
                         var configString = JsonConvert.SerializeObject(config, Formatting.Indented);
                         sr.Write(configString);
                     }
-                    stream.Close();
                 }
             }
             catch (Exception ex)
@@ -231,7 +240,6 @@ namespace TSREWARD
                             var configString = sr.ReadToEnd();
                             config = JsonConvert.DeserializeObject<Config>(configString);
                         }
-                        stream.Close();
                     }
                     return true;
                 }
